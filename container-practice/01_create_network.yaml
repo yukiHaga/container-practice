@@ -40,6 +40,7 @@ Resources:
           Value: sbcntr-route-table-public-ingress-1a
   SbcntrPublicIngressSubnetRoute:
     Type: AWS::EC2::Route
+    DependsOn: AttachSbcntrIGWToVPC
     Properties:
       RouteTableId: !Ref SbcntrPublicIngressSubnetRouteTable
       DestinationCidrBlock: 0.0.0.0/0
@@ -56,6 +57,8 @@ Resources:
       VpcId: !Ref SbcntrVPC
       SecurityGroupIngress:
         - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
           CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
@@ -80,6 +83,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
+          SourceSecurityGroupId: !Ref SbcntrPublicIngressSg
       Tags:
         - Key: Name
           Value: sbcntr-private-container-sg
@@ -104,6 +108,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 3306
           ToPort: 3306
+          SourceSecurityGroupId: !Ref SbcntrPrivateContainerSg
       Tags:
         - Key: Name
           Value: sbcntr-private-db-sg
