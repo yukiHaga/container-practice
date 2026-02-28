@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  SbcntrVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      Tags:
+        - Key: Name
+          Value: sbcntrVpc
+
+  # インターネットへの通信経路の設定
+  IGW:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: sbcntr-igw
+  AttachIGWToVPC:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref SbcntrVPC
+      InternetGatewayId: !Ref IGW
+      Tags:
+        - Key: Name
+          Value: sbcntr-igw-attachment
+
+  # Ingress用Subnetの設定
+  SbcntrPublicIngressSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref SbcntrVPC
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: 10.0.0.0/24
+      Tags:
+        - Key: Name
+          Value: sbcntr-subnet-public-ingress-1a
+  SbcntrPublicIngressSubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref SbcntrVPC
+      Tags:
+        - Key: Name
+          Value: sbcntr-route-table-public-ingress-1a
+  SbcntrPublicIngressSubnetRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref SbcntrPublicIngressSubnetRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref IGW
+      Tags:
+        - Key: Name
+          Value: sbcntr-route-table-public-ingress-1a-route
+  SbcntrPublicIngressSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SbcntrPublicIngressSubnet
+      RouteTableId: !Ref SbcntrPublicIngressSubnetRouteTable
+      Tags:
+        - Key: Name
+          Value: sbcntr-subnet-public-ingress-1a-route-table-association
+
+  SbcntrPrivateContainerSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref SbcntrVPC
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: 10.0.8.0/24
+      Tags:
+        - Key: Name
+          Value: sbcntr-subnet-private-container-1a
+  SbcntrPrivateDbSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref SbcntrVPC
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: 10.0.16.0/24
+      Tags:
+        - Key: Name
+          Value: sbcntr-subnet-private-db-1a
+  SbcntrPublicManagementSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref SbcntrVPC
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: 10.0.24.0/24
+      Tags:
+        - Key: Name
+          Value: sbcntr-subnet-public-management-1a
