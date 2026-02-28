@@ -52,6 +52,7 @@ Resources:
   SbcntrPublicIngressSg:
     Type: AWS::EC2::SecurityGroup
     Properties:
+      GroupDescription: Security group for public ingress
       VpcId: !Ref SbcntrVPC
       SecurityGroupIngress:
         - IpProtocol: tcp
@@ -73,6 +74,7 @@ Resources:
   SbcntrPrivateContainerSg:
     Type: AWS::EC2::SecurityGroup
     Properties:
+      GroupDescription: Security group for private container
       VpcId: !Ref SbcntrVPC
       SecurityGroupIngress:
         - IpProtocol: tcp
@@ -96,6 +98,7 @@ Resources:
   SbcntrPrivateDbSg:
     Type: AWS::EC2::SecurityGroup
     Properties:
+      GroupDescription: Security group for private database
       VpcId: !Ref SbcntrVPC
       SecurityGroupIngress:
         - IpProtocol: tcp
