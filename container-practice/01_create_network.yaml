@@ -9,22 +9,19 @@ Resources:
           Value: sbcntrVpc
 
   # インターネットへの通信経路の設定
-  IGW:
+  SbcntrIGW:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
         - Key: Name
           Value: sbcntr-igw
-  AttachIGWToVPC:
+  AttachSbcntrIGWToVPC:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
       VpcId: !Ref SbcntrVPC
-      InternetGatewayId: !Ref IGW
-      Tags:
-        - Key: Name
-          Value: sbcntr-igw-attachment
+      InternetGatewayId: !Ref SbcntrIGW
 
-  # Ingress用Subnetの設定
+  # Ingress用の設定
   SbcntrPublicIngressSubnet:
     Type: AWS::EC2::Subnet
     Properties:
@@ -46,19 +43,24 @@ Resources:
     Properties:
       RouteTableId: !Ref SbcntrPublicIngressSubnetRouteTable
       DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref IGW
-      Tags:
-        - Key: Name
-          Value: sbcntr-route-table-public-ingress-1a-route
+      GatewayId: !Ref SbcntrIGW
   SbcntrPublicIngressSubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref SbcntrPublicIngressSubnet
       RouteTableId: !Ref SbcntrPublicIngressSubnetRouteTable
+  SbcntrPublicIngressSg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref SbcntrVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
-          Value: sbcntr-subnet-public-ingress-1a-route-table-association
+          Value: sbcntr-public-ingress-sg
 
+  # Container用の設定
   SbcntrPrivateContainerSubnet:
     Type: AWS::EC2::Subnet
     Properties:
@@ -68,6 +70,20 @@ Resources:
       Tags:
         - Key: Name
           Value: sbcntr-subnet-private-container-1a
+  SbcntrPrivateContainerSg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref SbcntrVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+      Tags:
+        - Key: Name
+          Value: sbcntr-private-container-sg
+
+
+  # DB用の設定
   SbcntrPrivateDbSubnet:
     Type: AWS::EC2::Subnet
     Properties:
@@ -77,6 +93,19 @@ Resources:
       Tags:
         - Key: Name
           Value: sbcntr-subnet-private-db-1a
+  SbcntrPrivateDbSg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref SbcntrVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+      Tags:
+        - Key: Name
+          Value: sbcntr-private-db-sg
+
+  # Management用の設定
   SbcntrPublicManagementSubnet:
     Type: AWS::EC2::Subnet
     Properties:
