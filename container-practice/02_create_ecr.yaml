@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Resources:
+  SbcntrBackendECRRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: sbcntr-backend
+      EncryptionConfiguration:
+        EncryptionType: KMS
+      ImageTagMutability: MUTABLE
+      ImageScanningConfiguration:
+        ScanOnPush: false
+  SbcntrFrontendECRRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: sbcntr-frontend
+      EncryptionConfiguration:
+        EncryptionType: KMS
+      ImageTagMutability: MUTABLE
+      ImageScanningConfiguration:
+        ScanOnPush: false
